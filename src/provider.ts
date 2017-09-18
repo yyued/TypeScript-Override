@@ -1,17 +1,27 @@
 import * as vscode from 'vscode';
+import { OverrideSnippetsProcess } from "./process"
 
-export class OverrideSnippetsProvider implements vscode.CompletionItemProvider {
+export class OverrideSnippetsProvider implements vscode.CompletionItemProvider{
 
-    provideCompletionItems (document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
-        
-        return new Promise((resole, reject) =>{
-            
-            const lineText = document.getText(new vscode.Range(position.with(undefined, 0), position));
-            
-            console.log(lineText)
+    constructor(private process: OverrideSnippetsProcess) { }
 
-            return resolve([]);
-        });
-    
+    public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.CompletionItem[]{
+
+        const lineText = document.lineAt(position).text;
+        const res = this.process.convert(lineText);
+
+        var completionItems = [];
+
+        const item = new vscode.CompletionItem(res.method, vscode.CompletionItemKind.Snippet);
+        item.insertText = res.completion;
+
+        completionItems.push(item)
+        return completionItems;
     }
+
+    public resolveCompletionItem(item: vscode.CompletionItem, token: vscode.CancellationToken): any{
+        return item;
+    }
+
+    dispose(){ }
 }

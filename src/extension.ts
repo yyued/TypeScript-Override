@@ -1,11 +1,14 @@
 'use strict';
 import * as vscode from 'vscode';
+import { OverrideSnippetsProcess } from './process';
 import { OverrideSnippetsProvider } from './provider';
 
-// let config = null;
+let config = null;
 export function activate(context: vscode.ExtensionContext) {
-    // config = vscode.workspace.getConfiguration('');
-    let provider = new OverrideSnippetsProvider();
+    config = vscode.workspace.getConfiguration('');
+
+    const process = new OverrideSnippetsProcess(config);
+    let provider = new OverrideSnippetsProvider(process);
 
     const LANS = ['typescript', 'typescriptreact'];
 
@@ -13,4 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
         let providerDisposable = vscode.languages.registerCompletionItemProvider(lan, provider);
         context.subscriptions.push(providerDisposable);
     }
+}
+
+// this method is called when your extension is deactivated(禁用)
+export function deactivate() {
 }
